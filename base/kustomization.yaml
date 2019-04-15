@@ -1,0 +1,3 @@
+resources:
+- api-base.yaml
+- ingress-base.yaml

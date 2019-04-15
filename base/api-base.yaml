@@ -1,0 +1,62 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: api-base
+  labels:
+    kube-monkey/enabled: enabled
+    kube-monkey/identifier: api-base
+    kube-monkey/mtbf: '1'
+    kube-monkey/kill-mode: "random-max-percent"
+    kube-monkey/kill-value: '75'
+spec:
+  replicas: 4
+  revisionHistoryLimit: 0
+  template:
+    metadata:
+      labels:
+        kube-monkey/enabled: enabled
+    spec:
+      containers:
+      - name: api-base
+        ports:
+        - containerPort: 5000
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /healthz
+            port: 5000
+          initialDelaySeconds: 90
+          timeoutSeconds: 5
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /healthz
+            port: 5000
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 5
+        envFrom:
+        - configMapRef:
+            name: environment-config
+        env:
+        - name: DOGSTATSD_HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+      imagePullSecrets:
+      - name: engdockercfg
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: api-base
+spec:
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
