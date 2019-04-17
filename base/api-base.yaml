@@ -2,6 +2,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: api-base
+  namespace: namespace-id
   labels:
     app: api-base
     kube-monkey/enabled: enabled
@@ -24,7 +25,7 @@ spec:
       annotations:
         ad.datadoghq.com/api-base.check_names: '["http_check"]'
         ad.datadoghq.com/api-base.init_configs: '[{}]'
-        ad.datadoghq.com/api-base.instances: '[{"name": "api-base","url": "https://api-base-namespace.engagedtechnologies.com/swagger/index.html","timeout": 1,"disable_ssl_validation": false,"http_response_status_code": 200}]'
+        ad.datadoghq.com/api-base.instances: '[{"name": "api-base","url": "https://api-base-namespace-id.engagedtechnologies.com/swagger/index.html","timeout": 1,"disable_ssl_validation": false,"http_response_status_code": 200}]'
     spec:
       containers:
       - name: api-base
@@ -68,6 +69,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: api-base
+  namespace: namespace-id
 spec:
   selector:
     app: api-base
@@ -80,6 +82,7 @@ apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
   name: api-base-pdb
+  namespace: namespace-id
 spec:
   minAvailable: 1
   selector:
@@ -90,6 +93,7 @@ apiVersion: autoscaling.k8s.io/v1beta2
 kind: VerticalPodAutoscaler
 metadata:
   name: api-base-vpa
+  namespace: namespace-id
 spec:
   targetRef:
     apiVersion: "apps/v1beta1"
@@ -102,17 +106,17 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: api-base
-  namespace: prod
+  namespace: namespace-id
   annotations:
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
 spec:
   tls:
   - hosts:
-    - api-base-namespace.engagedtechnologies.com
+    - api-base-namespace-id.engagedtechnologies.com
     secretName: wildcard-tls
   rules:
-  - host: api-base-namespace.engagedtechnologies.com
+  - host: api-base-namespace-id.engagedtechnologies.com
     http:
       paths:
       - path: /
