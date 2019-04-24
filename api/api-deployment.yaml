@@ -36,8 +36,6 @@ spec:
         envFrom:
         - configMapRef:
             name: environment-config
-        - secretRef:
-            name: api-secrets
         env:
         - name: DOGSTATSD_HOST_IP
           valueFrom:
