@@ -1,0 +1,6 @@
+resources:
+- api-deployment.yaml
+- api-ingress.yaml
+- api-pdb.yaml
+- api-service.yaml
+- api-vpa.yaml

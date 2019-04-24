@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 4
+  revisionHistoryLimit: 0
+template:
+    spec:
+      containers:
+      - name: api
+        image: api
+        ports:
+        - containerPort: 5000
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /healthz
+            port: 5000
+          initialDelaySeconds: 90
+          timeoutSeconds: 5
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /healthz
+            port: 5000
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 5
+        envFrom:
+        - configMapRef:
+            name: environment-config
+        env:
+        - name: DOGSTATSD_HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+      imagePullSecrets:
+      - name: engdockercfg
